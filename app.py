@@ -13,9 +13,7 @@ st.set_page_config(layout="wide", page_title="Análisis de Opiniones de Clientes
 st.title("Análisis de Opiniones de Clientes")
 st.markdown("---")
 
-# --- Cargar el modelo de clasificación de sentimientos ---
-# Usaremos un modelo pre-entrenado de Hugging Face para español
-# Este modelo es excelente para clasificación de sentimientos en español
+
 @st.cache_resource
 def load_sentiment_model():
     return pipeline("sentiment-analysis", model="finiteautomata/beto-sentiment-analysis")
