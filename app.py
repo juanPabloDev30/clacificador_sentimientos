@@ -6,6 +6,8 @@ from wordcloud import WordCloud
 import re
 from transformers import pipeline
 import plotly.express as px
+import joblib
+import os # Import the os module
 
 # --- Configuración de la página ---
 st.set_page_config(layout="wide", page_title="Análisis de Opiniones de Clientes")
@@ -13,10 +15,21 @@ st.set_page_config(layout="wide", page_title="Análisis de Opiniones de Clientes
 st.title("Análisis de Opiniones de Clientes")
 st.markdown("---")
 
+# Define the model path
+MODEL_PATH = "sentiment_model.pkl"
 
 @st.cache_resource
 def load_sentiment_model():
-    return pipeline("sentiment-analysis", model="finiteautomata/beto-sentiment-analysis")
+    # Check if the model file exists
+    if os.path.exists(MODEL_PATH):
+        st.write(f"Cargando el modelo de sentimientos desde {MODEL_PATH}...")
+        return joblib.load(MODEL_PATH)
+    else:
+        st.write("Descargando y guardando el modelo de sentimientos (primera vez)...")
+        classifier = pipeline("sentiment-analysis", model="finiteautomata/beto-sentiment-analysis")
+        joblib.dump(classifier, MODEL_PATH)
+        st.success(f"Modelo guardado en {MODEL_PATH}")
+        return classifier
 
 classifier = load_sentiment_model()
 
@@ -93,9 +106,9 @@ if uploaded_file is not None:
                         if top_10_words:
                             df_top_words = pd.DataFrame(top_10_words, columns=['Palabra', 'Frecuencia'])
                             fig_bar = px.bar(df_top_words, x='Palabra', y='Frecuencia', 
-                                            title='Top 10 Palabras Más Frecuentes',
-                                            labels={'Palabra': 'Palabra', 'Frecuencia': 'Frecuencia'},
-                                            color='Frecuencia', color_continuous_scale=px.colors.sequential.Plasma)
+                                             title='Top 10 Palabras Más Frecuentes',
+                                             labels={'Palabra': 'Palabra', 'Frecuencia': 'Frecuencia'},
+                                             color='Frecuencia', color_continuous_scale=px.colors.sequential.Plasma)
                             st.plotly_chart(fig_bar, use_container_width=True)
                         else:
                             st.info("No hay palabras para mostrar después de eliminar stopwords.")
@@ -127,8 +140,8 @@ if uploaded_file is not None:
                 df_sentiment_counts.columns = ['Sentimiento', 'Porcentaje']
 
                 fig_pie = px.pie(df_sentiment_counts, values='Porcentaje', names='Sentimiento', 
-                                title='Distribución de Sentimientos',
-                                color_discrete_map={'POS': 'green', 'NEG': 'red', 'NEU': 'blue'})
+                                 title='Distribución de Sentimientos',
+                                 color_discrete_map={'POS': 'green', 'NEG': 'red', 'NEU': 'blue'})
                 st.plotly_chart(fig_pie, use_container_width=True)
             else:
                 st.info("Sube opiniones para ver la clasificación de sentimientos.")
