@@ -7,15 +7,13 @@ import re
 from transformers import pipeline
 import plotly.express as px
 import joblib
-import os # Import the os module
+import os
 
-# --- Configuración de la página ---
-st.set_page_config(layout="wide", page_title="Análisis de Opiniones de Clientes")
+st.set_page_config(layout="wide", page_title="jp_company")
 
 st.title("Análisis de Opiniones de Clientes")
 st.markdown("---")
 
-# Define the model path
 MODEL_PATH = "sentiment_model.pkl"
 
 @st.cache_resource
@@ -33,10 +31,9 @@ def load_sentiment_model():
 
 classifier = load_sentiment_model()
 
-# --- Funciones Auxiliares ---
 def clean_text(text):
-    text = re.sub(r'[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]', '', text) # Eliminar caracteres no alfabéticos
-    text = text.lower() # Convertir a minúsculas
+    text = re.sub(r'[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]', '', text)
+    text = text.lower()
     return text
 
 def remove_stopwords(text, stopwords_list):
