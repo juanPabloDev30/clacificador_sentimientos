@@ -18,7 +18,6 @@ MODEL_PATH = "sentiment_model.pkl"
 
 @st.cache_resource
 def load_sentiment_model():
-    # Check if the model file exists
     if os.path.exists(MODEL_PATH):
         st.write(f"Cargando el modelo de sentimientos desde {MODEL_PATH}...")
         return joblib.load(MODEL_PATH)
@@ -41,12 +40,10 @@ def remove_stopwords(text, stopwords_list):
     filtered_words = [word for word in words if word not in stopwords_list]
     return " ".join(filtered_words)
 
-# Lista básica de stopwords en español (puedes expandirla)
 spanish_stopwords = [
     "de", "la", "que", "el", "en", "y", "a", "los", "del", "se", "las", "por", "un", "para", "con", "no", "una", "su", "al", "es", "o", "lo", "como", "más", "pero", "sus", "le", "ha", "me", "si", "sin", "sobre", "este", "mi", "ya", "muy", "también", "esto", "ir", "haber", "ser", "tener", "estar", "hacer", "poder", "decir", "ver", "dar", "saber", "querer", "llegar", "pasar", "deber", "quedar", "parecer", "creer", "hablar", "llevar", "dejar", "seguir", "encontrar", "llamar", "venir", "pensar", "tomar", "conocer", "salir", "quedar", "entender", "recibir", "recordar", "cumplir", "esperar", "buscar", "resultar", "volver", "cambiar", "sentir", "enviar", "comenzar", "ayudar", "entrar", "presentar", "demostrar", "obtener", "incluir", "considerar", "desarrollar", "permanecer", "establecer", "construir", "organizar", "producir", "ofrecer", "necesitar", "realizar", "aceptar", "compartir", "dirigir", "participar", "evitar", "obtener", "comprar", "vender", "usar", "utilizar", "mejor", "peor", "bueno", "malo", "gran", "poco", "mucho", "todo", "nada", "cada", "mismo", "otro", "varios", "algunos", "primer", "segundo", "último", "nuevo", "viejo", "grande", "pequeño", "alto", "bajo", "cerca", "lejos", "aquí", "allí", "siempre", "nunca", "a veces", "antes", "después", "durante", "entonces", "luego", "pronto", "tarde", "hoy", "mañana", "ayer", "ahora", "donde", "cuando", "como", "cuanto", "quien", "que"
 ]
 
-# --- Sección de Carga de Opiniones ---
 st.header("1. Subir Opiniones de Clientes (Archivo .csv)")
 uploaded_file = st.file_uploader("Sube tu archivo .csv (una opinión por fila/columna). Asegúrate de que las opiniones estén en una columna llamada 'opinion' o 'texto'.", type="csv")
 
@@ -55,13 +52,12 @@ opiniones_df = pd.DataFrame()
 if uploaded_file is not None:
     try:
         data = pd.read_csv(uploaded_file)
-        # Intentar encontrar la columna de opiniones
         if 'opinion' in data.columns:
             opiniones_df = data[['opinion']].copy()
         elif 'texto' in data.columns:
             opiniones_df = data[['texto']].copy()
             opiniones_df.rename(columns={'texto': 'opinion'}, inplace=True)
-        elif len(data.columns) > 0: # Si no hay columna específica, tomamos la primera
+        elif len(data.columns) > 0: 
             opiniones_df = data.iloc[:, 0:1].copy()
             opiniones_df.columns = ['opinion']
         else:
